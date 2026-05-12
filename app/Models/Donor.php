@@ -8,11 +8,31 @@ class Donor extends Model {
     use HasFactory;
 
     protected $fillable = [
-        'user_id','name','blood_group','age','gender',
-        'phone','address','city','last_donation_date','status'
+        'user_id',
+        'name',
+        'blood_group',
+        'age',
+        'gender',
+        'phone',
+        'address',
+        'city',
+        'last_donation_date',
+        'status'
     ];
 
-    protected $casts = ['last_donation_date' => 'date'];
+    protected $casts = [
+        'last_donation_date' => 'date'
+    ];
 
-    public function user() { return $this->belongsTo(User::class); }
+    // Donor belongs to a User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Donor has many Donations
+    public function donations()
+    {
+        return $this->hasMany(Donation::class);
+    }
 }
