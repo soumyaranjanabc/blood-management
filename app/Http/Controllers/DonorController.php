@@ -13,16 +13,25 @@ class DonorController extends Controller
         $this->middleware(['auth', 'role:donor']);
     }
 
+    // public function dashboard()
+    // {
+    //     $user      = auth()->user();
+    //     $donor     = Donor::where('user_id', $user->id)->first();
+    //     $inventory = BloodInventory::all();
+    //     $myRequests = BloodRequest::where('user_id', $user->id)->latest()->take(5)->get();
+
+    //     return view('donor.dashboard', compact('user', 'donor', 'inventory', 'myRequests'));
+    // }
     public function dashboard()
     {
-        $user      = auth()->user();
-        $donor     = Donor::where('user_id', $user->id)->first();
-        $inventory = BloodInventory::all();
-        $myRequests = BloodRequest::where('user_id', $user->id)->latest()->take(5)->get();
+    $user       = auth()->user();
+    $donor      = Donor::where('user_id', $user->id)->first();
+    $inventory  = BloodInventory::all();
+    $myDonations = \App\Models\Donation::where('user_id', $user->id)
+                    ->latest()->take(5)->get();
 
-        return view('donor.dashboard', compact('user', 'donor', 'inventory', 'myRequests'));
+    return view('donor.dashboard', compact('user', 'donor', 'inventory', 'myDonations'));
     }
-
     public function profile()
     {
         $user  = auth()->user();

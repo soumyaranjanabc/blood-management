@@ -132,6 +132,10 @@
            class="nav-link {{ request()->routeIs('admin.inventory*') ? 'active' : '' }}">
             <i class="bi bi-droplet-half"></i> Inventory
         </a>
+        <a href="{{ route('admin.donations') }}"
+           class="nav-link {{ request()->routeIs('admin.donations*') ? 'active' : '' }}">
+            <i class="bi bi-patch-check-fill"></i> Verify Donations
+        </a>
         <div class="nav-section">Users</div>
         <a href="{{ route('admin.users') }}"
            class="nav-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
@@ -153,9 +157,9 @@
            class="nav-link {{ request()->routeIs('donor.inventory') ? 'active' : '' }}">
             <i class="bi bi-droplet-half"></i> Blood Availability
         </a>
-        <a href="{{ route('donor.requests') }}"
-           class="nav-link {{ request()->routeIs('donor.requests*') ? 'active' : '' }}">
-            <i class="bi bi-clipboard2-pulse-fill"></i> My Requests
+        <a href="{{ route('donor.donations') }}"
+           class="nav-link {{ request()->routeIs('donor.donations*') ? 'active' : '' }}">
+            <i class="bi bi-droplet-fill"></i> My Donations
         </a>
 
     @elseif(auth()->user()->isHospital())
