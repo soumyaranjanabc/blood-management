@@ -1,78 +1,70 @@
 @extends('layouts.app')
 @section('content')
 
+<div class="page-header">
+    <h4>Admin Dashboard</h4>
+    <p>Welcome back, {{ auth()->user()->name }}! Here's what's happening today.</p>
+</div>
+
+{{-- Stat Cards --}}
 <div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card stat-card bg-danger text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="fs-2 fw-bold">{{ $stats['total_donors'] }}</div>
-                        <div class="small">Total Donors</div>
-                    </div>
-                    <i class="bi bi-people-fill fs-1 opacity-50"></i>
-                </div>
-            </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card card-red">
+            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-value">{{ $stats['total_donors'] }}</div>
+            <div class="stat-label">Total Donors</div>
+            <i class="bi bi-people-fill stat-bg-icon"></i>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card stat-card bg-primary text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="fs-2 fw-bold">{{ $stats['total_hospitals'] }}</div>
-                        <div class="small">Hospitals</div>
-                    </div>
-                    <i class="bi bi-hospital-fill fs-1 opacity-50"></i>
-                </div>
-            </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card card-blue">
+            <div class="stat-icon"><i class="bi bi-hospital-fill"></i></div>
+            <div class="stat-value">{{ $stats['total_hospitals'] }}</div>
+            <div class="stat-label">Hospitals</div>
+            <i class="bi bi-hospital-fill stat-bg-icon"></i>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card stat-card bg-warning text-dark">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="fs-2 fw-bold">{{ $stats['pending_requests'] }}</div>
-                        <div class="small">Pending Requests</div>
-                    </div>
-                    <i class="bi bi-hourglass-split fs-1 opacity-50"></i>
-                </div>
-            </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card card-orange">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value">{{ $stats['pending_requests'] }}</div>
+            <div class="stat-label">Pending Requests</div>
+            <i class="bi bi-hourglass-split stat-bg-icon"></i>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card stat-card bg-success text-white">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="fs-2 fw-bold">{{ $stats['fulfilled_requests'] }}</div>
-                        <div class="small">Fulfilled Requests</div>
-                    </div>
-                    <i class="bi bi-check-circle-fill fs-1 opacity-50"></i>
-                </div>
-            </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card card-green">
+            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-value">{{ $stats['fulfilled_requests'] }}</div>
+            <div class="stat-label">Fulfilled</div>
+            <i class="bi bi-check-circle-fill stat-bg-icon"></i>
         </div>
     </div>
 </div>
 
-{{-- Blood Inventory Overview --}}
-<div class="card shadow-sm mb-4">
-    <div class="card-header bg-white fw-bold">
-        <i class="bi bi-droplet-half text-danger"></i> Blood Inventory Overview
+{{-- Inventory Overview --}}
+<div class="section-card mb-4">
+    <div class="section-header">
+        <div class="section-title"><i class="bi bi-droplet-half"></i> Blood Inventory Overview</div>
+        <a href="{{ route('admin.inventory') }}" class="btn btn-blood btn-sm">Manage</a>
     </div>
-    <div class="card-body">
+    <div class="p-4">
         <div class="row g-3">
             @foreach($inventory as $item)
             <div class="col-md-3 col-6">
-                <div class="border rounded p-3 text-center">
-                    <div class="blood-badge mb-2">{{ $item->blood_group }}</div>
-                    <div class="fw-bold fs-5">{{ $item->units_available }} <small class="text-muted fw-normal">units</small></div>
-                    <div class="text-muted small">Reserved: {{ $item->units_reserved }}</div>
-                    <div class="progress mt-2" style="height:6px;">
-                        @php $pct = $item->units_available > 0 ? min(100, ($item->units_available / 100) * 100) : 0; @endphp
-                        <div class="progress-bar bg-danger" style="width:{{ $pct }}%"></div>
+                <div class="inventory-item">
+                    <div class="inv-blood">{{ $item->blood_group }}</div>
+                    <div class="inv-count">{{ $item->units_available }}</div>
+                    <div class="inv-label">units available</div>
+                    <div class="inv-progress">
+                        @php $pct = min(100, ($item->units_available / max(1,100)) * 100); @endphp
+                        <div class="inv-progress-bar" style="width:{{ $pct }}%"></div>
                     </div>
+                    @if($item->units_available < 10)
+                        <span class="badge mt-2" style="background:#f8d7da;color:#842029;font-size:0.7rem;">Low Stock</span>
+                    @else
+                        <span class="badge mt-2" style="background:#d1e7dd;color:#0f5132;font-size:0.7rem;">Available</span>
+                    @endif
                 </div>
             </div>
             @endforeach
@@ -83,65 +75,57 @@
 <div class="row g-4">
     {{-- Recent Requests --}}
     <div class="col-md-7">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white fw-bold d-flex justify-content-between">
-                <span><i class="bi bi-clipboard2-pulse text-danger"></i> Recent Blood Requests</span>
-                <a href="{{ route('admin.requests') }}" class="btn btn-sm btn-outline-danger">View All</a>
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title"><i class="bi bi-clipboard2-pulse-fill"></i> Recent Blood Requests</div>
+                <a href="{{ route('admin.requests') }}" class="btn btn-blood btn-sm">View All</a>
             </div>
-            <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Patient</th>
-                            <th>Blood</th>
-                            <th>Units</th>
-                            <th>Priority</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($recentRequests as $req)
-                        <tr>
-                            <td>{{ $req->patient_name }}</td>
-                            <td><span class="blood-badge" style="width:30px;height:30px;line-height:30px;font-size:0.65rem;">{{ $req->blood_group }}</span></td>
-                            <td>{{ $req->units_required }}</td>
-                            <td><span class="badge badge-{{ $req->priority }}">{{ ucfirst($req->priority) }}</span></td>
-                            <td><span class="badge badge-{{ $req->status }}">{{ ucfirst($req->status) }}</span></td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="5" class="text-center text-muted py-3">No requests yet</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Patient</th><th>Blood</th><th>Units</th><th>Priority</th><th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentRequests as $req)
+                    <tr>
+                        <td class="fw-600">{{ $req->patient_name }}</td>
+                        <td><div class="blood-badge" style="width:32px;height:32px;font-size:0.65rem;">{{ $req->blood_group }}</div></td>
+                        <td>{{ $req->units_required }}</td>
+                        <td><span class="status-badge badge-{{ $req->priority }}">{{ ucfirst($req->priority) }}</span></td>
+                        <td><span class="status-badge badge-{{ $req->status }}">{{ ucfirst($req->status) }}</span></td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="5" class="text-center text-muted py-4">No requests yet</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 
     {{-- Recent Donors --}}
     <div class="col-md-5">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white fw-bold d-flex justify-content-between">
-                <span><i class="bi bi-people text-danger"></i> Recent Donors</span>
-                <a href="{{ route('admin.donors') }}" class="btn btn-sm btn-outline-danger">View All</a>
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title"><i class="bi bi-people-fill"></i> Recent Donors</div>
+                <a href="{{ route('admin.donors') }}" class="btn btn-blood btn-sm">View All</a>
             </div>
-            <div class="card-body p-0">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr><th>Name</th><th>Blood</th><th>City</th></tr>
-                    </thead>
-                    <tbody>
-                        @forelse($recentDonors as $donor)
-                        <tr>
-                            <td>{{ $donor->name }}</td>
-                            <td><span class="blood-badge" style="width:30px;height:30px;line-height:30px;font-size:0.65rem;">{{ $donor->blood_group }}</span></td>
-                            <td>{{ $donor->city }}</td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="3" class="text-center text-muted py-3">No donors yet</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+            <table class="table">
+                <thead>
+                    <tr><th>Name</th><th>Blood</th><th>City</th></tr>
+                </thead>
+                <tbody>
+                    @forelse($recentDonors as $donor)
+                    <tr>
+                        <td class="fw-600">{{ $donor->name }}</td>
+                        <td><div class="blood-badge" style="width:32px;height:32px;font-size:0.65rem;">{{ $donor->blood_group }}</div></td>
+                        <td>{{ $donor->city }}</td>
+                    </tr>
+                    @empty
+                    <tr><td colspan="3" class="text-center text-muted py-4">No donors yet</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
